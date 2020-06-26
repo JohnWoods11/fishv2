@@ -21,6 +21,7 @@ function Session(props) {
 
   const endCast = () => {
     props.recordReelIn();
+    props.recordCatchFail();
     props.endCast();
   };
 
@@ -46,17 +47,17 @@ function Session(props) {
   };
 
   if (toHome) {
-    return <Redirect to="/"></Redirect>;
+    return <Redirect to="/fishv2/"></Redirect>;
   }
   if (toCatch) {
-    return <Redirect to="/fish/catch"></Redirect>;
+    return <Redirect to="/fishv2/catch"></Redirect>;
   }
 
   return props.currentSession ? (
     <div className={styles.container}>
       <div className={styles.header}>
         {props.lakes[props.currentSession.lakeIndex].name}{" "}
-        <Link to="/">
+        <Link to="/fishv2/">
           <Button>home</Button>
         </Link>
       </div>

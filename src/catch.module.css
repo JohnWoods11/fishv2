@@ -1,0 +1,43 @@
+.container {
+  height: 90vh;
+  min-height: 90vh;
+  width: 100vw;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.species {
+  height: 10vh;
+  width: 80vw;
+}
+
+.weight {
+  height: 10vh;
+  width: 80vw;
+
+  font-weight: bold;
+  font-size: large;
+}
+
+.catchStats {
+  height: 40vh;
+  width: 80vw;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+
+.statsPair {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.recordButton {
+  height: 10vh;
+  width: 80vw;
+}

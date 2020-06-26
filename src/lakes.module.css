@@ -2,9 +2,23 @@
   height: 90vh;
   min-height: 90vh;
   width: 100vw;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.accordionContainer {
+  height: 75vh;
+  width: 100vw;
+  overflow: scroll;
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
 .lakeHeader {
+  width: 90vw;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -21,4 +35,13 @@
 .bodyButtons {
   display: flex;
   flex-direction: column;
+}
+
+.backButton {
+  height: 15;
+  width: 80vw;
+}
+
+.accordionContainer::-webkit-scrollbar {
+  display: none;
 }

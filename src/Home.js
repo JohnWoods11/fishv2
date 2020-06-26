@@ -13,20 +13,25 @@ function Home(props) {
   };
 
   if (toSession) {
-    return <Redirect to="/fish/session"></Redirect>;
+    return <Redirect to="/fishv2/session"></Redirect>;
   }
 
   return (
     <div className={styles.container}>
-      <Link to="/fish/lakes">
-        <Button size="lg">Lakes</Button>
+      <Link to="/fishv2/lakes">
+        <Button className={styles.button} size="lg">
+          Lakes
+        </Button>
       </Link>
 
-      <Link to="/fish/stats">
-        <Button size="lg">Statistics</Button>
+      <Link to="/fishv2/stats">
+        <Button className={styles.button} size="lg">
+          Statistics
+        </Button>
       </Link>
 
       <Button
+        className={styles.button}
         size="lg"
         variant={props.currentSession ? "primary" : "secondary"}
         onClick={toCurrentSession}

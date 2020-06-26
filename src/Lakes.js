@@ -3,7 +3,7 @@ import Button from "react-bootstrap/Button";
 import Accordion from "react-bootstrap/Accordion";
 import Card from "react-bootstrap/Card";
 import styles from "./lakes.module.css";
-import { Redirect } from "react-router-dom";
+import { Redirect, Link } from "react-router-dom";
 
 function Lakes(props) {
   const [toSession, setToSession] = useState(false);
@@ -33,68 +33,78 @@ function Lakes(props) {
   };
 
   if (toSession) {
-    return <Redirect to="/fish/session"></Redirect>;
+    return <Redirect to="/fishv2/session"></Redirect>;
   }
 
   return (
     <div className={styles.container}>
-      <Accordion defaultActiveKey="0">
-        {props.lakes.map((lake, index) => (
-          <Card Key={index}>
-            <Accordion.Toggle as={Card.Header} eventKey={index}>
+      <div className={styles.accordionContainer}>
+        <Accordion defaultActiveKey="0">
+          {props.lakes.map((lake, index) => (
+            <Card Key={index}>
+              <Accordion.Toggle as={Card.Header} eventKey={index}>
+                <div className={styles.lakeHeader}>
+                  {lake.name}
+                  <div>
+                    <Button
+                      variant="success"
+                      sz="lg"
+                      onClick={(event) => {
+                        startSession(event, index);
+                      }}
+                    >
+                      Fish
+                    </Button>
+                  </div>
+                </div>
+              </Accordion.Toggle>
+              <Accordion.Collapse eventKey={index}>
+                <Card.Body>
+                  <div className={styles.lakeBody}>
+                    Stats here some time
+                    <div className={styles.bodyButtons}>
+                      <Button
+                        variant="primary"
+                        sz="lg"
+                        onClick={(event) => editLake(event, index)}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        variant="danger"
+                        onClick={() => deleteLake(index)}
+                      >
+                        Delete
+                      </Button>
+                    </div>
+                  </div>
+                </Card.Body>
+              </Accordion.Collapse>
+            </Card>
+          ))}
+          <Card>
+            <Accordion.Toggle as={Card.Header} eventKey={props.lakes.length}>
               <div className={styles.lakeHeader}>
-                {lake.name}
+                Add a lake
                 <div>
                   <Button
-                    variant="success"
+                    variant="primary"
                     sz="lg"
-                    onClick={(event) => {
-                      startSession(event, index);
-                    }}
+                    onClick={(event) => addLake(event)}
                   >
-                    Fish
+                    Add
                   </Button>
                 </div>
               </div>
             </Accordion.Toggle>
-            <Accordion.Collapse eventKey={index}>
-              <Card.Body>
-                <div className={styles.lakeBody}>
-                  Stats here some time
-                  <div className={styles.bodyButtons}>
-                    <Button
-                      variant="primary"
-                      sz="lg"
-                      onClick={(event) => editLake(event, index)}
-                    >
-                      Edit
-                    </Button>
-                    <Button variant="danger" onClick={() => deleteLake(index)}>
-                      Delete
-                    </Button>
-                  </div>
-                </div>
-              </Card.Body>
-            </Accordion.Collapse>
           </Card>
-        ))}
-        <Card>
-          <Accordion.Toggle as={Card.Header} eventKey={props.lakes.length}>
-            <div className={styles.lakeHeader}>
-              Add a lake
-              <div>
-                <Button
-                  variant="primary"
-                  sz="lg"
-                  onClick={(event) => addLake(event)}
-                >
-                  Add
-                </Button>
-              </div>
-            </div>
-          </Accordion.Toggle>
-        </Card>
-      </Accordion>
+        </Accordion>
+      </div>
+      <Link to="/fishv2/">
+        <Button className={styles.backButton} variant="primary">
+          Back
+        </Button>
+      </Link>
     </div>
   );
 }
