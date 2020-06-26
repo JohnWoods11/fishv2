@@ -1,0 +1,90 @@
+.container {
+  height: 90vh;
+  min-height: 90vh;
+  width: 100vw;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.statSelectorButton {
+  height: 20vh;
+  width: 80vw;
+}
+
+.filterContainer {
+  height: 8vh;
+  width: 80vw;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.generalStats {
+  height: 25vh;
+  width: 80vw;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+  font-size: medium;
+}
+
+.generalStat {
+  height: 5vh;
+  width: 39vw;
+
+  flex-direction: column;
+
+  align-items: flex-start;
+}
+
+.generalStatHeader {
+  font-weight: bold;
+}
+
+.categoryStats {
+  height: 50vh;
+  width: 80vw;
+}
+
+.statsButton {
+  width: 80vw;
+}
+
+.graphContainer {
+  height: 15vh;
+  width: 80vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.baitGraphContainer {
+  height: 15vh;
+  width: 80vw;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.year {
+  height: 8vh;
+  width: 80vw;
+
+  display: flex;
+  flex-direction: row;
+}
+
+.day {
+  height: 8vh;
+  width: 2vw;
+  display: flex;
+  flex-direction: column;
+}

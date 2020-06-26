@@ -1,0 +1,399 @@
+import React, { useState } from "react";
+import styles from "./statistics.module.css";
+import Button from "react-bootstrap/Button";
+import Dropdown from "react-bootstrap/Dropdown";
+import DropdownButton from "react-bootstrap/DropdownButton";
+import ButtonGroup from "react-bootstrap/ButtonGroup";
+import { Link } from "react-router-dom";
+
+class Statistics extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      baitUsage: [],
+      daysOfYearArray: [],
+      filteredCastList: [],
+      generalStats: {
+        catchRate: null,
+        timeCasted: null,
+        bites: null,
+        catches: null,
+        heaviestCatch: null,
+      },
+      isCastStats: false,
+      isFishStats: false,
+      lakeIndexFilter: null,
+      baitFilter: null,
+      styleFilter: null,
+    };
+  }
+
+  resetStatsScreen = () => {
+    this.setState({
+      filteredCastList: [],
+      generalStats: {
+        catchRate: null,
+        timeCasted: null,
+        bites: null,
+        catches: null,
+        heaviestCatch: null,
+        filteredCastTotal: null,
+      },
+      isCastStats: false,
+      isFishStats: false,
+    });
+  };
+
+  showCastStats = () => {
+    let newFilteredList = [];
+    let castStats = [...this.props.castHistory];
+    castStats.map((cast, index) => {
+      newFilteredList.push(index);
+    });
+    this.mapStats(newFilteredList);
+    this.setState({ isCastStats: true });
+  };
+
+  mapStats = (filteredCastList) => {
+    let newFilter = filteredCastList;
+    let newAllDaysOfYear = [];
+    for (let i = 0; i < 372; i++) {
+      newAllDaysOfYear.push(0);
+    }
+    let filteredBaitUsage = [];
+    for (let i = 0; i < this.props.baits.length + 1; i++) {
+      //+1 on array to store null baits
+      filteredBaitUsage.push(0);
+    }
+    let filteredCatches = 0;
+    let filteredTimeCasted = 0;
+    let filteredBites = 0;
+    let filteredHeaviestCatch = 0;
+    newFilter.map((castIndex) => {
+      if (this.props.castHistory[castIndex].catchSuccess === true) {
+        filteredCatches++;
+        let date = this.props.mSToDate(
+          this.props.castHistory[castIndex].reelInTime
+        );
+        let dayOfLongYear = date.getDate() + date.getMonth() * 31;
+        newAllDaysOfYear[dayOfLongYear] += 1;
+      }
+
+      filteredTimeCasted += this.props.castHistory[castIndex].duration;
+      filteredBites += this.props.castHistory[castIndex].bites;
+      if (this.props.castHistory[castIndex].weight > filteredHeaviestCatch) {
+        filteredHeaviestCatch = this.props.castHistory[castIndex].weight;
+      }
+      this.props.castHistory[castIndex].bait === null
+        ? (filteredBaitUsage[this.props.baits.length] += 1)
+        : (filteredBaitUsage[
+            this.props.baits.indexOf(this.props.castHistory[castIndex].bait)
+          ] += 1);
+    });
+
+    let newCatchRate = filteredCatches / filteredCastList.length;
+    let newCastingDuration = filteredTimeCasted;
+    let newBites = filteredBites;
+    let newCatches = filteredCatches;
+    let newHeaviestCatch = filteredHeaviestCatch;
+    let newFilteredCastToltal = filteredCastList.length;
+
+    let newGeneralStats = {
+      catchRate: newCatchRate,
+      timeCasted: newCastingDuration,
+      bites: newBites,
+      catches: newCatches,
+      heaviestCatch: newHeaviestCatch,
+      filteredCastTotal: newFilteredCastToltal,
+    };
+
+    newAllDaysOfYear.splice(61, 1);
+    newAllDaysOfYear.splice(62, 1);
+    newAllDaysOfYear.splice(124, 1);
+    newAllDaysOfYear.splice(186, 1);
+    newAllDaysOfYear.splice(279, 1);
+    newAllDaysOfYear.splice(341, 1);
+
+    this.setState({
+      generalStats: newGeneralStats,
+      daysOfYearArray: newAllDaysOfYear,
+      baitUsage: filteredBaitUsage,
+    });
+  };
+
+  updateFilterList = (lakeIndexFilter, baitFilter, styleFilter) => {
+    let newFilterList = [];
+    this.props.castHistory.map((cast, index) => {
+      if (lakeIndexFilter !== null) {
+        if (lakeIndexFilter !== cast.lakeIndex) {
+          return;
+        }
+      }
+      if (baitFilter !== null) {
+        if (baitFilter !== cast.bait) {
+          return;
+        }
+      }
+      if (styleFilter !== null) {
+        if (styleFilter !== cast.style) {
+          return;
+        }
+      }
+      newFilterList.push(index);
+    });
+    this.mapStats(newFilterList);
+  };
+
+  setLakeFilter = (index) => {
+    let newLakeFilter = this.state.lakeIndexFilter;
+    newLakeFilter = index;
+    this.setState({ lakeIndexFilter: newLakeFilter });
+    this.updateFilterList(
+      newLakeFilter,
+      this.state.baitFilter,
+      this.state.styleFilter
+    );
+  };
+
+  setBaitFilter = (bait) => {
+    let newBaitFilter = this.state.baitFilter;
+    newBaitFilter = bait;
+    this.setState({ baitFilter: newBaitFilter });
+    this.updateFilterList(
+      this.state.lakeIndexFilter,
+      newBaitFilter,
+      this.state.styleFilter
+    );
+  };
+
+  setStyleFilter = (style) => {
+    let newStyleFilter = this.state.styleFilter;
+    newStyleFilter = style;
+    this.setState({ styleFilter: newStyleFilter });
+    this.updateFilterList(
+      this.state.lakeIndexFilter,
+      this.state.baitFilter,
+      newStyleFilter
+    );
+  };
+
+  changeLakeFilterx;
+  render() {
+    return (
+      <div>
+        {this.state.isCastStats ? (
+          <div className={styles.container}>
+            <div className={styles.filterContainer}>
+              <DropdownButton
+                as={ButtonGroup}
+                variant="info"
+                title={
+                  this.state.lakeIndexFilter !== null
+                    ? this.props.lakes[this.state.lakeIndexFilter].name
+                    : "All lakes"
+                }
+              >
+                <Dropdown.Item
+                  eventKey={0}
+                  onClick={() => {
+                    this.setLakeFilter(null);
+                  }}
+                >
+                  All lakes
+                </Dropdown.Item>
+                {this.props.lakes.map((lake, index) => (
+                  <Dropdown.Item
+                    eventKey={index + 1}
+                    onClick={() => {
+                      this.setLakeFilter(index);
+                      console.log(index);
+                    }}
+                  >
+                    {lake.name}
+                  </Dropdown.Item>
+                ))}
+              </DropdownButton>
+              <DropdownButton
+                as={ButtonGroup}
+                variant="info"
+                title={
+                  this.state.baitFilter !== null
+                    ? this.state.baitFilter
+                    : "All baits"
+                }
+              >
+                <Dropdown.Item
+                  eventKey={0}
+                  onClick={() => {
+                    this.setBaitFilter(null);
+                  }}
+                >
+                  All baits
+                </Dropdown.Item>
+                {this.props.baits.map((bait, index) => (
+                  <Dropdown.Item
+                    eventKey={index + 1}
+                    onClick={() => {
+                      this.setBaitFilter(bait);
+                    }}
+                  >
+                    {bait}
+                  </Dropdown.Item>
+                ))}
+              </DropdownButton>
+              <DropdownButton
+                as={ButtonGroup}
+                variant="info"
+                title={
+                  this.state.styleFilter !== null
+                    ? this.state.styleFilter
+                    : "All styles"
+                }
+              >
+                <Dropdown.Item
+                  eventKey={0}
+                  onClick={() => {
+                    this.setStyleFilter(null);
+                  }}
+                >
+                  All styles
+                </Dropdown.Item>
+                {this.props.styles.map((style, index) => (
+                  <Dropdown.Item
+                    eventKey={index + 1}
+                    onClick={() => {
+                      this.setStyleFilter(style);
+                    }}
+                  >
+                    {style}
+                  </Dropdown.Item>
+                ))}
+              </DropdownButton>
+            </div>
+
+            <div className={styles.generalStats}>
+              <div className={styles.generalStat}>
+                <div className={styles.generalStatHeader}>Time casted:</div>{" "}
+                {this.props.mSToReadable(this.state.generalStats.timeCasted)}
+              </div>
+              <div className={styles.generalStat}>
+                <div className={styles.generalStatHeader}>Heaviest catch:</div>{" "}
+                {this.props.kilosToPoundsReadable(
+                  this.state.generalStats.heaviestCatch
+                )}
+              </div>
+              <div className={styles.generalStat}>
+                <div className={styles.generalStatHeader}>Catches:</div>{" "}
+                {this.state.generalStats.catches}
+              </div>
+              <div className={styles.generalStat}>
+                <div className={styles.generalStatHeader}>Catch rate:</div>{" "}
+                {(this.state.generalStats.catchRate * 100).toFixed(0)}%
+              </div>
+              <div className={styles.generalStat}>
+                <div className={styles.generalStatHeader}>Bites:</div>{" "}
+                {this.state.generalStats.bites}
+              </div>
+              <div className={styles.generalStat}>
+                <div className={styles.generalStatHeader}>Casts:</div>{" "}
+                {this.state.generalStats.filteredCastTotal}
+              </div>
+            </div>
+
+            <div className={styles.categoryStats}>
+              <div className={styles.graphContainer}>
+                <div className={styles.year}>
+                  {this.state.daysOfYearArray.map((day, index) => (
+                    <div className={styles.day}>
+                      <div
+                        style={{
+                          backgroundColor: "white",
+                          width: "0.2vw",
+                          height: day < 10 ? `${8 - day * 0.8}vh` : "8vh",
+                        }}
+                      ></div>
+                      <div
+                        style={{
+                          backgroundColor: "green",
+                          width: "0.2vw",
+                          height: day < 10 ? `${day * 0.8}vh` : "8vh",
+                        }}
+                      ></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className={styles.baitGraphContainer}>
+                {this.state.baitUsage.map((bait, index) =>
+                  bait ? (
+                    <div
+                      style={{
+                        width: `${
+                          (80 /
+                            this.state.baitUsage.reduce((a, b) => a + b, 0)) *
+                          bait
+                        }vw`,
+                        color: "white",
+                        backgroundColor:
+                          index % 4 === 0
+                            ? "blue"
+                            : index % 4 === 1
+                            ? "red"
+                            : index % 4 === 2
+                            ? "green"
+                            : "yellow",
+                        fontSize: "small",
+                        textAlign: "center",
+                      }}
+                    >
+                      {index === this.props.baits.length
+                        ? "NA"
+                        : this.props.baits[index]}
+                    </div>
+                  ) : null
+                )}
+              </div>
+            </div>
+
+            <Button
+              className={styles.statsButton}
+              variant="primary"
+              onClick={this.resetStatsScreen}
+            >
+              stats
+            </Button>
+          </div>
+        ) : this.state.isFishStats ? (
+          <div className={styles.container}>
+            <div className={styles.statsContainer}>fishStats</div>
+            <Button variant="primary" onClick={this.resetStatsScreen}>
+              stats
+            </Button>
+          </div>
+        ) : (
+          <div className={styles.container}>
+            <Button
+              className={styles.statSelectorButton}
+              variant="primary"
+              onClick={this.showCastStats}
+            >
+              Cast stats
+            </Button>
+            <Button className={styles.statSelectorButton} variant="primary">
+              Fish stats
+            </Button>
+
+            <Link to="/fishv2/">
+              <Button className={styles.statSelectorButton} variant="primary">
+                Back
+              </Button>
+            </Link>
+          </div>
+        )}
+      </div>
+    );
+  }
+}
+
+export default Statistics;
