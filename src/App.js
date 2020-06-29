@@ -99,6 +99,7 @@ class App extends React.Component {
                 lakes={this.state.lakes}
                 baits={this.state.baits}
                 styles={this.state.styles}
+                species={this.state.species}
                 mSToReadable={this.mSToReadable}
                 kilosToPoundsReadable={this.kilosToPoundsReadable}
                 mSToDate={this.mSToDate}

@@ -55,92 +55,94 @@ function Session(props) {
 
   return props.currentSession ? (
     <div className={styles.container}>
-      <div className={styles.header}>
-        {props.lakes[props.currentSession.lakeIndex].name}{" "}
-        <Link to="/fishv2/">
-          <Button>home</Button>
-        </Link>
-      </div>
-      <div
-        className={styles.castInfo}
-        onClick={props.currentSession.casting === false ? cast : null}
-      >
-        {props.currentSession.casting === true ? (
-          <div>
-            {props.currentSession.casts}{" "}
-            {props.currentSession.currentCast.bites}
-          </div>
-        ) : (
-          "CAST"
-        )}
-      </div>{" "}
-      <div className={styles.castingOptions}>
-        <DropdownButton
-          as={ButtonGroup}
-          variant="info"
-          title={
-            props.currentSession.bait ? props.currentSession.bait : "NO BAIT"
-          }
+      <div>
+        <div className={styles.header}>
+          {props.lakes[props.currentSession.lakeIndex].name}{" "}
+        </div>
+        <div
+          className={styles.castInfo}
+          onClick={props.currentSession.casting === false ? cast : null}
         >
-          {props.baits.map((bait, index) => (
-            <Dropdown.Item
-              eventKey={index}
-              onClick={() => {
-                changeBait(bait);
-              }}
-            >
-              {bait}
-            </Dropdown.Item>
-          ))}
-        </DropdownButton>
+          {props.currentSession.casting === true ? (
+            <div>
+              {props.currentSession.casts}{" "}
+              {props.currentSession.currentCast.bites}
+            </div>
+          ) : (
+            "CAST"
+          )}
+        </div>{" "}
+        <div className={styles.castingOptions}>
+          <DropdownButton
+            as={ButtonGroup}
+            variant="info"
+            title={
+              props.currentSession.bait ? props.currentSession.bait : "NO BAIT"
+            }
+          >
+            {props.baits.map((bait, index) => (
+              <Dropdown.Item
+                eventKey={index}
+                onClick={() => {
+                  changeBait(bait);
+                }}
+              >
+                {bait}
+              </Dropdown.Item>
+            ))}
+          </DropdownButton>
 
-        <DropdownButton
-          as={ButtonGroup}
-          variant="info"
-          title={
-            props.currentSession.style ? props.currentSession.style : "NO STYLE"
-          }
-        >
-          {props.styles.map((style, index) => (
-            <Dropdown.Item
-              eventKey={index}
-              onClick={() => {
-                changeStyle(style);
-              }}
-            >
-              {style}
-            </Dropdown.Item>
-          ))}
-        </DropdownButton>
-      </div>
-      <div className={styles.verticalButtons}>
-        <Button
-          className={styles.catchButton}
-          variant="success"
-          size="lg"
-          onClick={recordCatchDetails}
-        >
-          FISH LANDED
-        </Button>{" "}
-        <div className={styles.horizontalButtons}>
-          <Button
-            className={styles.otherButton}
-            variant="primary"
-            size="lg"
-            onClick={addBite}
+          <DropdownButton
+            as={ButtonGroup}
+            variant="info"
+            title={
+              props.currentSession.style
+                ? props.currentSession.style
+                : "NO STYLE"
+            }
           >
-            BITE OR RUN
+            {props.styles.map((style, index) => (
+              <Dropdown.Item
+                eventKey={index}
+                onClick={() => {
+                  changeStyle(style);
+                }}
+              >
+                {style}
+              </Dropdown.Item>
+            ))}
+          </DropdownButton>
+        </div>
+        <div className={styles.verticalButtons}>
+          <Button
+            className={styles.catchButton}
+            variant="success"
+            size="lg"
+            onClick={recordCatchDetails}
+          >
+            FISH LANDED
           </Button>{" "}
-          <Button
-            className={styles.otherButton}
-            variant={props.currentSession.casting ? "info" : "danger"}
-            size="lg"
-            onClick={props.currentSession.casting ? endCast : endSession}
-          >
-            {props.currentSession.casting ? "END CAST" : "END SESSION"}
-          </Button>
+          <div className={styles.horizontalButtons}>
+            <Button
+              className={styles.otherButton}
+              variant="primary"
+              onClick={addBite}
+            >
+              BITE OR RUN
+            </Button>{" "}
+            <Button
+              className={styles.otherButton}
+              variant={props.currentSession.casting ? "info" : "danger"}
+              onClick={props.currentSession.casting ? endCast : endSession}
+            >
+              {props.currentSession.casting ? "END CAST" : "END SESSION"}
+            </Button>
+          </div>
         </div>
       </div>
+      <Link to="/fishv2/">
+        <Button className={styles.backButton}>Back</Button>
+      </Link>
     </div>
   ) : (
     <Redirect to="/"></Redirect>

@@ -10,7 +10,9 @@ class Statistics extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      styleUsage: [],
       baitUsage: [],
+      catchSpecies: [],
       daysOfYearArray: [],
       filteredCastList: [],
       generalStats: {
@@ -65,6 +67,16 @@ class Statistics extends React.Component {
       //+1 on array to store null baits
       filteredBaitUsage.push(0);
     }
+    let filteredStyleUsage = [];
+    for (let i = 0; i < this.props.styles.length + 1; i++) {
+      //+1 on array to store null baits
+      filteredStyleUsage.push(0);
+    }
+    let filteredSpeciesList = [];
+    for (let i = 0; i < this.props.species.length + 1; i++) {
+      //+1 on array to store null baits
+      filteredSpeciesList.push(0);
+    }
     let filteredCatches = 0;
     let filteredTimeCasted = 0;
     let filteredBites = 0;
@@ -77,6 +89,13 @@ class Statistics extends React.Component {
         );
         let dayOfLongYear = date.getDate() + date.getMonth() * 31;
         newAllDaysOfYear[dayOfLongYear] += 1;
+        this.props.castHistory[castIndex].species === null
+          ? (filteredSpeciesList[this.props.species.length] += 1)
+          : (filteredSpeciesList[
+              this.props.species.indexOf(
+                this.props.castHistory[castIndex].species
+              )
+            ] += 1);
       }
 
       filteredTimeCasted += this.props.castHistory[castIndex].duration;
@@ -88,6 +107,11 @@ class Statistics extends React.Component {
         ? (filteredBaitUsage[this.props.baits.length] += 1)
         : (filteredBaitUsage[
             this.props.baits.indexOf(this.props.castHistory[castIndex].bait)
+          ] += 1);
+      this.props.castHistory[castIndex].style === null
+        ? (filteredStyleUsage[this.props.styles.length] += 1)
+        : (filteredStyleUsage[
+            this.props.styles.indexOf(this.props.castHistory[castIndex].style)
           ] += 1);
     });
 
@@ -118,6 +142,8 @@ class Statistics extends React.Component {
       generalStats: newGeneralStats,
       daysOfYearArray: newAllDaysOfYear,
       baitUsage: filteredBaitUsage,
+      styleUsage: filteredStyleUsage,
+      catchSpecies: filteredSpeciesList,
     });
   };
 
@@ -301,7 +327,7 @@ class Statistics extends React.Component {
             </div>
 
             <div className={styles.categoryStats}>
-              <div className={styles.graphContainer}>
+              <div className={styles.timeGraphContainer}>
                 <div className={styles.year}>
                   {this.state.daysOfYearArray.map((day, index) => (
                     <div className={styles.day}>
@@ -324,7 +350,7 @@ class Statistics extends React.Component {
                 </div>
               </div>
 
-              <div className={styles.baitGraphContainer}>
+              <div className={styles.graphContainer}>
                 {this.state.baitUsage.map((bait, index) =>
                   bait ? (
                     <div
@@ -354,38 +380,104 @@ class Statistics extends React.Component {
                   ) : null
                 )}
               </div>
+
+              <div className={styles.graphContainer}>
+                {this.state.styleUsage.map((style, index) =>
+                  style ? (
+                    <div
+                      style={{
+                        width: `${
+                          (80 /
+                            this.state.styleUsage.reduce((a, b) => a + b, 0)) *
+                          style
+                        }vw`,
+                        color: "white",
+                        backgroundColor:
+                          index % 4 === 0
+                            ? "blue"
+                            : index % 4 === 1
+                            ? "red"
+                            : index % 4 === 2
+                            ? "green"
+                            : "yellow",
+                        fontSize: "small",
+                        textAlign: "center",
+                      }}
+                    >
+                      {index === this.props.styles.length
+                        ? "NA"
+                        : this.props.styles[index]}
+                    </div>
+                  ) : null
+                )}
+              </div>
+
+              <div className={styles.graphContainer}>
+                {this.state.catchSpecies.map((species, index) =>
+                  species ? (
+                    <div
+                      style={{
+                        width: `${
+                          (80 /
+                            this.state.catchSpecies.reduce(
+                              (a, b) => a + b,
+                              0
+                            )) *
+                          species
+                        }vw`,
+                        color: "white",
+                        backgroundColor:
+                          index % 4 === 0
+                            ? "blue"
+                            : index % 4 === 1
+                            ? "red"
+                            : index % 4 === 2
+                            ? "green"
+                            : "yellow",
+                        fontSize: "small",
+                        textAlign: "center",
+                      }}
+                    >
+                      {index === this.props.species.length
+                        ? "NA"
+                        : this.props.species[index]}
+                    </div>
+                  ) : null
+                )}
+              </div>
             </div>
 
             <Button
-              className={styles.statsButton}
+              className={styles.backButton}
               variant="primary"
               onClick={this.resetStatsScreen}
             >
-              stats
+              Back
             </Button>
           </div>
         ) : this.state.isFishStats ? (
           <div className={styles.container}>
             <div className={styles.statsContainer}>fishStats</div>
             <Button variant="primary" onClick={this.resetStatsScreen}>
-              stats
+              back
             </Button>
           </div>
         ) : (
           <div className={styles.container}>
-            <Button
-              className={styles.statSelectorButton}
-              variant="primary"
-              onClick={this.showCastStats}
-            >
-              Cast stats
-            </Button>
-            <Button className={styles.statSelectorButton} variant="primary">
-              Fish stats
-            </Button>
-
-            <Link to="/fishv2/">
+            <div className={styles.statsOptions}>
+              <Button
+                className={styles.statSelectorButton}
+                variant="primary"
+                onClick={this.showCastStats}
+              >
+                Cast stats
+              </Button>
               <Button className={styles.statSelectorButton} variant="primary">
+                Fish stats
+              </Button>
+            </div>
+            <Link to="/fishv2/">
+              <Button className={styles.backButton} variant="primary">
                 Back
               </Button>
             </Link>
