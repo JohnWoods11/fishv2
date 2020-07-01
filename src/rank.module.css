@@ -1,0 +1,17 @@
+.container {
+  width: 80vw;
+  height: 90vh;
+  min-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.rankings {
+  font-size: small;
+  width: 38vw;
+  text-align: center;
+}
+
+.rank {
+  width: 34vw;
+}

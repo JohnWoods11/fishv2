@@ -63,7 +63,7 @@
 }
 
 .timeGraphContainer {
-  height: 15vh;
+  height: 10vh;
   width: 80vw;
   display: flex;
   flex-direction: column;
@@ -95,7 +95,33 @@
   flex-direction: column;
 }
 
+.hours {
+  height: 8vh;
+  width: 80vw;
+
+  display: flex;
+  flex-direction: row;
+}
+
+.hour {
+  height: 8vh;
+
+  display: flex;
+  flex-direction: column;
+
+  box-sizing: border-box;
+}
+.hourScale {
+  font-size: xx-small;
+  text-align: center;
+}
+
 .backButton {
   height: 15;
   width: 80vw;
+}
+
+.graph {
+  border: solid;
+  border-color: white;
 }

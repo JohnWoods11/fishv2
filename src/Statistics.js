@@ -5,6 +5,7 @@ import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import { Link } from "react-router-dom";
+import Rankings from "./Rankings";
 
 class Statistics extends React.Component {
   constructor(props) {
@@ -14,6 +15,7 @@ class Statistics extends React.Component {
       baitUsage: [],
       catchSpecies: [],
       daysOfYearArray: [],
+      dayArray: [],
       filteredCastList: [],
       generalStats: {
         catchRate: null,
@@ -23,7 +25,7 @@ class Statistics extends React.Component {
         heaviestCatch: null,
       },
       isCastStats: false,
-      isFishStats: false,
+      isRankStats: false,
       lakeIndexFilter: null,
       baitFilter: null,
       styleFilter: null,
@@ -42,7 +44,10 @@ class Statistics extends React.Component {
         filteredCastTotal: null,
       },
       isCastStats: false,
-      isFishStats: false,
+      isRankStats: false,
+      lakeIndexFilter: null,
+      baitFilter: null,
+      styleFilter: null,
     });
   };
 
@@ -56,11 +61,25 @@ class Statistics extends React.Component {
     this.setState({ isCastStats: true });
   };
 
+  showRankings = () => {
+    let newRankingsList = [];
+    let castDataIndexes = [...this.props.castHistory];
+    castDataIndexes.map((cast, index) => {
+      newRankingsList.push(index);
+    });
+    this.mapStats(newRankingsList);
+    this.setState({ isRankStats: true });
+  };
+
   mapStats = (filteredCastList) => {
     let newFilter = filteredCastList;
     let newAllDaysOfYear = [];
     for (let i = 0; i < 372; i++) {
       newAllDaysOfYear.push(0);
+    }
+    let newDayArray = [];
+    for (let i = 0; i < 24; i++) {
+      newDayArray.push(0);
     }
     let filteredBaitUsage = [];
     for (let i = 0; i < this.props.baits.length + 1; i++) {
@@ -89,6 +108,8 @@ class Statistics extends React.Component {
         );
         let dayOfLongYear = date.getDate() + date.getMonth() * 31;
         newAllDaysOfYear[dayOfLongYear] += 1;
+        let hour = date.getHours();
+        newDayArray[hour] += 1;
         this.props.castHistory[castIndex].species === null
           ? (filteredSpeciesList[this.props.species.length] += 1)
           : (filteredSpeciesList[
@@ -96,13 +117,14 @@ class Statistics extends React.Component {
                 this.props.castHistory[castIndex].species
               )
             ] += 1);
+        if (this.props.castHistory[castIndex].weight > filteredHeaviestCatch) {
+          filteredHeaviestCatch = this.props.castHistory[castIndex].weight;
+        }
       }
 
       filteredTimeCasted += this.props.castHistory[castIndex].duration;
       filteredBites += this.props.castHistory[castIndex].bites;
-      if (this.props.castHistory[castIndex].weight > filteredHeaviestCatch) {
-        filteredHeaviestCatch = this.props.castHistory[castIndex].weight;
-      }
+
       this.props.castHistory[castIndex].bait === null
         ? (filteredBaitUsage[this.props.baits.length] += 1)
         : (filteredBaitUsage[
@@ -124,6 +146,7 @@ class Statistics extends React.Component {
 
     let newGeneralStats = {
       catchRate: newCatchRate,
+      dayArray: newDayArray,
       timeCasted: newCastingDuration,
       bites: newBites,
       catches: newCatches,
@@ -141,6 +164,7 @@ class Statistics extends React.Component {
     this.setState({
       generalStats: newGeneralStats,
       daysOfYearArray: newAllDaysOfYear,
+      dayArray: newDayArray,
       baitUsage: filteredBaitUsage,
       styleUsage: filteredStyleUsage,
       catchSpecies: filteredSpeciesList,
@@ -195,12 +219,13 @@ class Statistics extends React.Component {
   setStyleFilter = (style) => {
     let newStyleFilter = this.state.styleFilter;
     newStyleFilter = style;
-    this.setState({ styleFilter: newStyleFilter });
+
     this.updateFilterList(
       this.state.lakeIndexFilter,
       this.state.baitFilter,
       newStyleFilter
     );
+    this.setState({ styleFilter: newStyleFilter });
   };
 
   changeLakeFilterx;
@@ -299,7 +324,7 @@ class Statistics extends React.Component {
 
             <div className={styles.generalStats}>
               <div className={styles.generalStat}>
-                <div className={styles.generalStatHeader}>Time casted:</div>{" "}
+                <div className={styles.generalStatHeader}>Time cast:</div>{" "}
                 {this.props.mSToReadable(this.state.generalStats.timeCasted)}
               </div>
               <div className={styles.generalStat}>
@@ -349,11 +374,35 @@ class Statistics extends React.Component {
                   ))}
                 </div>
               </div>
+              <div className={styles.timeGraphContainer}>
+                <div className={styles.hours}>
+                  {this.state.dayArray.map((hour, index) => (
+                    <div className={styles.hour}>
+                      <div
+                        style={{
+                          backgroundColor: "white",
+                          width: `${80 / 24}vw`,
+                          height: hour < 10 ? `${8 - hour * 0.8}vh` : "8vh",
+                        }}
+                      ></div>
+                      <div
+                        style={{
+                          backgroundColor: "green",
+                          width: `${80 / 24}vw`,
+                          height: hour < 10 ? `${hour * 0.8}vh` : "8vh",
+                        }}
+                      ></div>
+                      <div className={styles.hourScale}> {index} </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
 
               <div className={styles.graphContainer}>
                 {this.state.baitUsage.map((bait, index) =>
                   bait ? (
                     <div
+                      className={styles.graph}
                       style={{
                         width: `${
                           (80 /
@@ -385,6 +434,7 @@ class Statistics extends React.Component {
                 {this.state.styleUsage.map((style, index) =>
                   style ? (
                     <div
+                      className={styles.graph}
                       style={{
                         width: `${
                           (80 /
@@ -416,6 +466,7 @@ class Statistics extends React.Component {
                 {this.state.catchSpecies.map((species, index) =>
                   species ? (
                     <div
+                      className={styles.graph}
                       style={{
                         width: `${
                           (80 /
@@ -455,11 +506,31 @@ class Statistics extends React.Component {
               Back
             </Button>
           </div>
-        ) : this.state.isFishStats ? (
+        ) : this.state.isRankStats ? (
           <div className={styles.container}>
-            <div className={styles.statsContainer}>fishStats</div>
-            <Button variant="primary" onClick={this.resetStatsScreen}>
-              back
+            <div className={styles.statsContainer}>
+              <Rankings
+                lakes={this.props.lakes}
+                baits={this.props.baits}
+                styles={this.props.styles}
+                species={this.props.species}
+                setLakeFilter={this.setLakeFilter}
+                setBaitFilter={this.setBaitFilter}
+                setStyleFilter={this.setStyleFilter}
+                lakeIndexFilter={this.state.lakeIndexFilter}
+                baitFilter={this.state.baitFilter}
+                styleFilter={this.state.styleFilter}
+                baitUsage={this.state.baitUsage}
+                styleUsage={this.state.styleUsage}
+                catchSpecies={this.state.catchSpecies}
+              ></Rankings>
+            </div>
+            <Button
+              className={styles.backButton}
+              variant="primary"
+              onClick={this.resetStatsScreen}
+            >
+              Back
             </Button>
           </div>
         ) : (
@@ -472,8 +543,12 @@ class Statistics extends React.Component {
               >
                 Cast stats
               </Button>
-              <Button className={styles.statSelectorButton} variant="primary">
-                Fish stats
+              <Button
+                className={styles.statSelectorButton}
+                variant="primary"
+                onClick={this.showRankings}
+              >
+                Rankings
               </Button>
             </div>
             <Link to="/fishv2/">
